@@ -1,6 +1,8 @@
 
 package interaction;
 
+import exception.NomExistantException;
+import exception.PartiePleineException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -28,10 +30,17 @@ public class Client extends UnicastRemoteObject {
             String name = Interaction.askForName();
             BoatPosition position = Interaction.askForPosition();
             
-            // Demande d'ajout auprès du serveur
-            serveur.setClient(name, position);
-            
-            // TODO
+            try {
+                // Demande d'ajout auprès du serveur
+                serveur.setClient(name, position);
+                
+                // TODO
+                
+            } catch (PartiePleineException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NomExistantException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
         } catch (NotBoundException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
