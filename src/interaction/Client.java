@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.BoatPosition;
 import model.Grille;
+import model.Position;
 
 public class Client extends UnicastRemoteObject implements ClientInterface, Serializable {
 
@@ -125,6 +126,15 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
     @Override
     public void recevoirMessage(String message) throws RemoteException {
         System.out.println(message);
+    }
+
+    @Override
+    public Position jouer() throws RemoteException {
+        System.out.print("A toi de jouer ! \nX=");
+        int x = Interaction.demanderEntierEntreIntervalle(1, 10);
+        System.out.print("Y=");
+        int y = Interaction.demanderEntierEntreIntervalle(1, 10);
+        return new Position(x-1, y-1);
     }
 
     

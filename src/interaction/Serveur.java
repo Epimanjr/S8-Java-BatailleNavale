@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.BoatPosition;
 import model.Grille;
+import model.Position;
 
 public class Serveur extends UnicastRemoteObject implements ServeurInterface {
 
@@ -24,6 +25,8 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
      * Contient toutes les grilles nécessaires au jeu.
      */
     private final ArrayList<Client> clients = new ArrayList<>();
+
+    private int numeroTour;
 
     public Serveur() throws RemoteException {
     }
@@ -62,7 +65,68 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
      * @throws RemoteException
      */
     private void lancerPartie() throws RemoteException {
+        boolean victoire = false;
+        numeroTour = 0;
+        String nameJoueurQuiDoitJouer="";
+        try {
+            Registry reg = LocateRegistry.getRegistry(3212);
+            while (!victoire) {
+                // Demande à un joueur de jouer
+                nameJoueurQuiDoitJouer = clients.get(numeroTour % 2).getName();
+                ClientInterface joueur = (ClientInterface) reg.lookup("Client_" + nameJoueurQuiDoitJouer);
+                Position pos = joueur.jouer();
+                // Impacter grille
+                Grille grilleImpactee = clients.get((numeroTour+1)%2).getGrille();
+                boolean touche = impacterGrille(pos, grilleImpactee);
+                // Notifier joueurs
+                notifierJoueurs(touche, numeroTour % 2, reg, joueur);
+                // Test victoire
+                victoire = grilleImpactee.testVictoire();
+                numeroTour++;
+            }
+            // Fin de la partie
+            System.out.println("Fin de la partie");
+            System.out.println("Vainqueur : " +nameJoueurQuiDoitJouer);
+        } catch (NotBoundException | AccessException ex) {
+            Logger.getLogger(Serveur.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
+    /**
+     * Impact sur la grille après un jeu.
+     *
+     * @param pos
+     * @param grille
+     * @throws RemoteException
+     */
+    private boolean impacterGrille(Position pos, Grille grille) throws RemoteException {
+        // Impact sur la grille
+        return grille.impact(pos);
+    }
+    
+    
+    private void notifierJoueurs(boolean touche, int indiceJoueur1, Registry reg, ClientInterface joueur) throws RemoteException {
+        try {
+            int indiceJoueur2 = (indiceJoueur1+1)%2;
+            ClientInterface joueur2 = (ClientInterface) reg.lookup("Client_" + clients.get(indiceJoueur2).getName());
+            // Affichage grilles
+            Grille grille = clients.get(indiceJoueur2).getGrille();
+            String messageJoueur1 = grille.afficherPourAdversaire();
+            String messageJoueur2 = grille.toString();
+            // Affichage message personnalisé
+            if(touche) {
+                messageJoueur1 += "Bien joué, vous avez touché un bateau de " + clients.get(indiceJoueur2).getName();
+                messageJoueur2 += "PLATCH: " + clients.get(indiceJoueur1).getName() + " a touché un de vos bateaux.";
+            } else {
+                messageJoueur1 += "Raté, tant pis pour la baleine.";
+                messageJoueur2 += "Sauvé, il ne sait pas viser.";
+            }
+            // Envoie des messages
+            joueur.recevoirMessage(messageJoueur1);
+            joueur2.recevoirMessage(messageJoueur2);
+        } catch (NotBoundException | AccessException ex) {
+            Logger.getLogger(Serveur.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**

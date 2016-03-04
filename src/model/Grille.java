@@ -2,7 +2,7 @@ package model;
 
 import java.io.Serializable;
 
-public class Grille  implements Serializable{
+public class Grille implements Serializable {
 
     /**
      * Taille de la grille.
@@ -30,7 +30,7 @@ public class Grille  implements Serializable{
     }
 
     /**
-     * Placement des X dans les cases correspondantes.
+     * Placement des B dans les cases correspondantes.
      *
      * @param position Position du bateau
      */
@@ -38,30 +38,49 @@ public class Grille  implements Serializable{
         // TODO placer le bateau
         int x = position.getPosX();
         int y = position.getPoxY();
-        for(int i=0;i<BoatPosition.BOAT_LENGTH;i++) {
-            this.grille[x][y] = "X";
-            if(position.getOrientation().toUpperCase().equals("H")) {
+        for (int i = 0; i < BoatPosition.BOAT_LENGTH; i++) {
+            this.grille[x][y] = "B";
+            if (position.getOrientation().toUpperCase().equals("H")) {
                 y++;
             }
-            if(position.getOrientation().toUpperCase().equals("V")) {
+            if (position.getOrientation().toUpperCase().equals("V")) {
                 x++;
             }
         }
     }
-    
+
     @Override
     public String toString() {
-        
+
         String s = "|   |";
-        for(int i=1;i<=10;i++) {
+        for (int i = 1; i <= 10; i++) {
             s += " " + i + " |";
         }
         s += "\n";
         s += "---------------------------------------------\n";
-        for(int i=1;i<=10;i++) {
+        for (int i = 1; i <= 10; i++) {
             s += "| " + i + " |";
-            for(int j=1;j<=10;j++) {
-                s += " " + this.grille[i-1][j-1] + " |";
+            for (int j = 1; j <= 10; j++) {
+                s += " " + this.grille[i - 1][j - 1] + " |";
+            }
+            s += "\n";
+            s += "---------------------------------------------\n";
+        }
+        return s;
+    }
+    
+    public String afficherPourAdversaire() {
+        String s = "|   |";
+        for (int i = 1; i <= 10; i++) {
+            s += " " + i + " |";
+        }
+        s += "\n";
+        s += "---------------------------------------------\n";
+        for (int i = 1; i <= 10; i++) {
+            s += "| " + i + " |";
+            for (int j = 1; j <= 10; j++) {
+                String affiche = (this.grille[i - 1][j - 1].equals("B")) ? "." : this.grille[i - 1][j - 1];
+                s += " " + affiche + " |";
             }
             s += "\n";
             s += "---------------------------------------------\n";
@@ -79,9 +98,42 @@ public class Grille  implements Serializable{
             }
         }
     }
-    
+
     public static void main(String[] args) {
         Grille g = new Grille();
         System.out.println(g);
+    }
+
+    /**
+     * Test de la victoire.
+     *
+     * @return boolean
+     */
+    public boolean testVictoire() {
+        for (int i = 0; i < Grille.TAILLE_GRILLE; i++) {
+            for (int j = 0; j < Grille.TAILLE_GRILLE; j++) {
+                if (this.grille[i][j].equals("B")) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Impact d'un tir sur une grille.
+     *
+     * @param pos Position ciblée
+     * @return vrai si bateau touché
+     */
+    public boolean impact(Position pos) {
+        String contenu =  this.grille[pos.x][pos.y];
+        if(contenu.equals("B")) {
+            this.grille[pos.x][pos.y] = "X";
+            return true;
+        } else {
+            this.grille[pos.x][pos.y] = "0";
+            return false;
+        }
     }
 }

@@ -3,6 +3,7 @@ package interaction;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import model.Grille;
+import model.Position;
 
 public interface ClientInterface extends Remote {
 
@@ -13,4 +14,6 @@ public interface ClientInterface extends Remote {
      * @throws RemoteException
      */
     public void recevoirMessage(String message) throws RemoteException;
+    
+    public Position jouer() throws RemoteException;
 }
