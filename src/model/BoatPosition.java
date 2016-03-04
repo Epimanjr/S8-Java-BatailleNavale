@@ -39,7 +39,7 @@ public class BoatPosition implements Serializable{
      */
     public boolean verifier() {
         // TODO : Algo de vérification d'une position
-        if(((this.posX + BOAT_LENGTH > Grille.TAILLE_GRILLE)&&(this.orientation=="V")) && ((this.posY + BOAT_LENGTH > Grille.TAILLE_GRILLE)&&(this.orientation=="H"))) {
+        if(((this.posX + BOAT_LENGTH > Grille.TAILLE_GRILLE)&&(this.orientation=="V")) || ((this.posY + BOAT_LENGTH > Grille.TAILLE_GRILLE)&&(this.orientation=="H"))) {
             return false;
         }
         return true;
