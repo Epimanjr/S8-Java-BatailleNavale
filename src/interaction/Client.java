@@ -12,6 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import model.BoatPosition;
+import model.Grille;
 
 public class Client extends UnicastRemoteObject {
 

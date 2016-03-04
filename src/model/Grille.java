@@ -36,6 +36,37 @@ public class Grille  implements Serializable{
      */
     private void setBoat(BoatPosition position) {
         // TODO placer le bateau
+        int x = position.getPosX();
+        int y = position.getPoxY();
+        for(int i=0;i<BoatPosition.BOAT_LENGTH;i++) {
+            this.grille[x][y] = "X";
+            if(position.getOrientation().toUpperCase().equals("H")) {
+                y++;
+            }
+            if(position.getOrientation().toUpperCase().equals("V")) {
+                x++;
+            }
+        }
+    }
+    
+    @Override
+    public String toString() {
+        
+        String s = "|   |";
+        for(int i=1;i<=10;i++) {
+            s += " " + i + " |";
+        }
+        s += "\n";
+        s += "---------------------------------------------\n";
+        for(int i=1;i<=10;i++) {
+            s += "| " + i + " |";
+            for(int j=1;j<=10;j++) {
+                s += " " + this.grille[i-1][j-1] + " |";
+            }
+            s += "\n";
+            s += "---------------------------------------------\n";
+        }
+        return s;
     }
 
     /**
@@ -44,8 +75,13 @@ public class Grille  implements Serializable{
     private void init() {
         for (int i = 0; i < TAILLE_GRILLE; i++) {
             for (int j = 0; j < TAILLE_GRILLE; j++) {
-                grille[i][j] = "";
+                grille[i][j] = ".";
             }
         }
+    }
+    
+    public static void main(String[] args) {
+        Grille g = new Grille();
+        System.out.println(g);
     }
 }

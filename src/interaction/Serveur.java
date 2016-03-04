@@ -37,7 +37,7 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
         Grille grille = new Grille(position);
         // OK, on ajoute le client
         clients.put(name, grille);
-        System.out.println("Nouveau client : " + name);
+        System.out.println("Nouveau client : " + name + "\n" + grille);
     }
     
     public static void main(String args[]) {

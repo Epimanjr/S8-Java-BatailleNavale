@@ -9,7 +9,7 @@ public class BoatPosition implements Serializable{
     /**
      * Taille par défaut d'un bateau.
      */
-    private static final int BOAT_LENGTH = 4;
+    public static final int BOAT_LENGTH = 4;
     
     /**
      * Orientation du bateau (H ou V).
