@@ -7,10 +7,10 @@ import model.Grille;
 public interface ClientInterface extends Remote {
 
     /**
-     * Méthode appelée par le serveur pour confirmer l'inscription du client.
+     * Méthode appelée par le serveur pour envoyer un message au client.
      *
-     * @param grille Grille du joueur
+     * @param message message
      * @throws RemoteException
      */
-    public void recevoirConfirmationInscription(Grille grille) throws RemoteException;
+    public void recevoirMessage(String message) throws RemoteException;
 }

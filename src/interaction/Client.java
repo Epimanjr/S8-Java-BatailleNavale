@@ -22,16 +22,23 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
      * Nom du client.
      */
     private String name;
+    
+    /**
+     * Grille du client.
+     */
+    private Grille grille;
 
 
     /**
      * Créer un client à partir de son nom.
      *
-     * @param name Nom du client.
+     * @param name Nom du client
+     * @param grille Grille du client
      * @throws RemoteException
      */
-    public Client(String name) throws RemoteException{
+    public Client(String name, Grille grille) throws RemoteException{
         this.name = name;
+        this.grille = grille;
     }
 
     /**
@@ -55,11 +62,12 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
 
             try {
                 // Vérifier l'inscription
-                serveur.verifierInscription(name, position);
+                Grille grille = serveur.verifierInscription(name, position);
+                Client client = new Client(name, grille);
                 // OK
-                reg.rebind("Client_"+name, (ClientInterface)new Client(name));
+                reg.rebind("Client_"+name, (ClientInterface)client);
                 // Demande d'ajout auprès du serveur
-                serveur.setClient(name, position);
+                serveur.setClient(name, grille);
             } catch (PartiePleineException ex) {
                 System.err.println("Erreur: partie déjà pleine.");
             } catch (NomExistantException ex) {
@@ -79,6 +87,15 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
         this.name = name;
     }
 
+    public Grille getGrille() {
+        return grille;
+    }
+
+    public void setGrille(Grille grille) {
+        this.grille = grille;
+    }
+
+    
     @Override
     public int hashCode() {
         int hash = 3;
@@ -100,18 +117,17 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
         return Objects.equals(this.name, other.name);
     }
     
-    
-
     @Override
     public String toString() {
         return this.name;
     }
 
     @Override
-    public void recevoirConfirmationInscription(Grille grille) throws RemoteException {
-        System.out.println("Votre inscription a été confirmée par le serveur.\n" + grille);
+    public void recevoirMessage(String message) throws RemoteException {
+        System.out.println(message);
     }
 
+    
     
     
 }
