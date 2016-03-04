@@ -1,8 +1,10 @@
 
 package model;
 
+import java.io.Serializable;
 
-public class BoatPosition {
+
+public class BoatPosition implements Serializable{
     
     /**
      * Orientation du bateau (H ou V).

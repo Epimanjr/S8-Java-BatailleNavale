@@ -1,6 +1,8 @@
 package model;
 
-public class Grille {
+import java.io.Serializable;
+
+public class Grille  implements Serializable{
 
     /**
      * Taille de la grille.

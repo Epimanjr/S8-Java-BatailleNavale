@@ -39,10 +39,11 @@ public class Interaction {
         do {
             System.out.println("Orientation (H/V) : ");
             orientation = SCANNER.nextLine();
-        } while (orientation.equals("H") || orientation.equals("V") || orientation.equals("h") || orientation.equals("v"));
+        } while (!orientation.equals("H") && !orientation.equals("V") && !orientation.equals("h") && !orientation.equals("v"));
         // Positions X & Y
         System.out.println("Position X : ");
         int posX = demanderEntierEntreIntervalle(1, 10);
+        System.out.println("Position Y : ");
         int posY = demanderEntierEntreIntervalle(1, 10);
         return new BoatPosition(orientation, posX - 1, posY - 1);
     }
