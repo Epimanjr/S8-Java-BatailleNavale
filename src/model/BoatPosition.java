@@ -7,6 +7,11 @@ import java.io.Serializable;
 public class BoatPosition implements Serializable{
     
     /**
+     * Taille par défaut d'un bateau.
+     */
+    private static final int BOAT_LENGTH = 4;
+    
+    /**
      * Orientation du bateau (H ou V).
      */
     private final String orientation;
@@ -14,7 +19,7 @@ public class BoatPosition implements Serializable{
     /**
      * Position de la première case du bateau.
      */
-    private final int posX, poxY;
+    private final int posX, posY;
 
     /**
      * Créer un bateau avec une certaine orientation et la bonne position.
@@ -22,10 +27,10 @@ public class BoatPosition implements Serializable{
      * @param posX Integer
      * @param poxY Integer
      */
-    public BoatPosition(String orientation, int posX, int poxY) {
+    public BoatPosition(String orientation, int posX, int posY) {
         this.orientation = orientation;
         this.posX = posX;
-        this.poxY = poxY;
+        this.posY = posY;
     }
     
     /**
@@ -34,6 +39,22 @@ public class BoatPosition implements Serializable{
      */
     public boolean verifier() {
         // TODO : Algo de vérification d'une position
-        return false;
+        if(((this.posX + BOAT_LENGTH > Grille.TAILLE_GRILLE)&&(this.orientation=="V")) && ((this.posY + BOAT_LENGTH > Grille.TAILLE_GRILLE)&&(this.orientation=="H"))) {
+            return false;
+        }
+        return true;
     }
+
+    public int getPosX() {
+        return posX;
+    }
+
+    public int getPoxY() {
+        return posY;
+    }
+
+    public String getOrientation() {
+        return orientation;
+    }
+    
 }
