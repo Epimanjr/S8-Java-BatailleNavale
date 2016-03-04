@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import model.BoatPosition;
 import model.Grille;
 
-public class Client implements Serializable {
+public class Client extends UnicastRemoteObject implements ClientInterface, Serializable {
 
     /**
      * Nom du client.
@@ -30,7 +30,7 @@ public class Client implements Serializable {
      * @param name Nom du client.
      * @throws RemoteException
      */
-    public Client(String name) {
+    public Client(String name) throws RemoteException{
         this.name = name;
     }
 
@@ -45,29 +45,28 @@ public class Client implements Serializable {
 
     public static void main(String args[]) {
         try {
+            // Récupère le serveur
             Registry reg = LocateRegistry.getRegistry(3212);
             ServeurInterface serveur = (ServeurInterface) reg.lookup("Serv");
 
-            // Demandes à l'utilisateur du nom et de la position de sont bateau
+            // Demande à l'utilisateur du nom et de la position de sont bateau
             String name = Interaction.askForName();
             BoatPosition position = Interaction.askForPosition();
 
             try {
+                // Vérifier l'inscription
+                serveur.verifierInscription(name, position);
+                // OK
+                reg.rebind("Client_"+name, (ClientInterface)new Client(name));
                 // Demande d'ajout auprès du serveur
-                Client cli = new Client(name);
-                serveur.setClient(cli, position);
-
-                // TODO
-                System.out.println("Inscription réalisée avec succès.");
+                serveur.setClient(name, position);
             } catch (PartiePleineException ex) {
                 System.err.println("Erreur: partie déjà pleine.");
             } catch (NomExistantException ex) {
                 System.err.println("Erreur: votre nom est déjà utilisé.");
             }
 
-        } catch (NotBoundException ex) {
-            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (RemoteException ex) {
+        } catch (NotBoundException | RemoteException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -106,6 +105,11 @@ public class Client implements Serializable {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    @Override
+    public void recevoirConfirmationInscription(Grille grille) throws RemoteException {
+        System.out.println("Votre inscription a été confirmée par le serveur.\n" + grille);
     }
 
     

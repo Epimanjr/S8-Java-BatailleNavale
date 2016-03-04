@@ -10,6 +10,7 @@ import model.BoatPosition;
 
 public interface ServeurInterface extends Remote {
     
-    public abstract void setClient(Client client, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException;
+    public abstract void verifierInscription(String name, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException;
+    public abstract void setClient(String name, BoatPosition position) throws RemoteException;
     
 }

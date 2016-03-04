@@ -2,7 +2,9 @@ package interaction;
 
 import exception.NomExistantException;
 import exception.PartiePleineException;
+import java.rmi.AccessException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -18,37 +20,49 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
     /**
      * Contient toutes les grilles nécessaires au jeu.
      */
-    private final HashMap<Client, Grille> clients = new HashMap<>();
-    
+    private final HashMap<String, Grille> clients = new HashMap<>();
+
     public Serveur() throws RemoteException {
     }
-    
+
     @Override
-    public void setClient(Client client, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException {
-        // Déjà deux joueurs
+    public void verifierInscription(String name, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException {
+    // Déjà deux joueurs
         if (clients.size() >= 2) {
             throw new PartiePleineException();
         }
         // Nom déjà pris
-        if (clients.containsKey(client)) {
+        if (clients.containsKey(name)) {
             throw new NomExistantException();
         }
+    }
+
+    @Override
+    public void setClient(String name, BoatPosition position) throws RemoteException {
+
         // Création de la grille
         Grille grille = new Grille(position);
         // OK, on ajoute le client
-        clients.put(client, grille);
-        System.out.println("Nouveau client : " + client + "\n" + grille);
-        client.afficherSaGrille(grille);
+        clients.put(name, grille);
+        System.out.println("Nouveau client : " + name + "\n" + grille);
+
+        try {
+            Registry reg = LocateRegistry.getRegistry(3212);
+            ClientInterface client = (ClientInterface) reg.lookup("Client_" + name);
+            client.recevoirConfirmationInscription(grille);
+        } catch (NotBoundException | AccessException ex) {
+            Logger.getLogger(Serveur.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
     public static void main(String args[]) {
         try {
             Registry reg = LocateRegistry.createRegistry(3212);
-            reg.rebind("Serv", (ServeurInterface)new Serveur());
+            reg.rebind("Serv", (ServeurInterface) new Serveur());
             System.out.println("Serveur OK");
         } catch (RemoteException ex) {
             Logger.getLogger(Serveur.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
 }
