@@ -18,26 +18,27 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
     /**
      * Contient toutes les grilles nécessaires au jeu.
      */
-    private final HashMap<String, Grille> clients = new HashMap<>();
+    private final HashMap<Client, Grille> clients = new HashMap<>();
     
     public Serveur() throws RemoteException {
     }
     
     @Override
-    public void setClient(String name, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException {
+    public void setClient(Client client, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException {
         // Déjà deux joueurs
         if (clients.size() >= 2) {
             throw new PartiePleineException();
         }
         // Nom déjà pris
-        if (clients.containsKey(name)) {
+        if (clients.containsKey(client)) {
             throw new NomExistantException();
         }
         // Création de la grille
         Grille grille = new Grille(position);
         // OK, on ajoute le client
-        clients.put(name, grille);
-        System.out.println("Nouveau client : " + name + "\n" + grille);
+        clients.put(client, grille);
+        System.out.println("Nouveau client : " + client + "\n" + grille);
+        client.afficherSaGrille(grille);
     }
     
     public static void main(String args[]) {
