@@ -63,8 +63,33 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
         notifierClients();
         // Lancement du jeu si 2 joueurs
         if (clients.size() == 2) {
-            //lancerPartie();
+            lancerPartie();
         }
+    }
+    
+    @Override
+    public void sendPosition(Position position) throws RemoteException {
+        // Impacter grille
+        Grille grilleImpactee = clients.get((numeroTour + 1) % 2).getGrille();
+        boolean touche = impacterGrille(position, grilleImpactee);
+        // Notifier joueurs
+        notifierJoueurs(touche, numeroTour);
+        // Test victoire
+        if(grilleImpactee.testVictoire()) {
+            finPartie();
+        } else {
+            numeroTour++;
+            jouerUnTour(numeroTour);
+        }
+    }
+    
+    private void finPartie() throws RemoteException {
+        ClientInterface vainqueur = this.clientsRemote.get((numeroTour - 1) % 2);
+        ClientInterface perdant = this.clientsRemote.get((numeroTour) % 2);
+        vainqueur.recevoirMessage("Bravo, tu as gagné la partie.\n");
+        perdant.recevoirMessage("Tu as perdu la partie.\n");
+        // Fin de la partie
+        System.out.println("Fin de la partie");
     }
 
     /**
@@ -76,28 +101,14 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
         boolean victoire = false;
         numeroTour = 0;
         initRemote();
-        while (!victoire) {
-            victoire = jouerUnTour(numeroTour);
-            numeroTour++;
-        }
-        ClientInterface vainqueur = this.clientsRemote.get((numeroTour - 1) % 2);
-        ClientInterface perdant = this.clientsRemote.get((numeroTour) % 2);
-        vainqueur.recevoirMessage("Bravo, tu as gagné la partie.");
-        vainqueur.recevoirMessage("Tu as perdu la partie.");
-        // Fin de la partie
-        System.out.println("Fin de la partie");
+        jouerUnTour(numeroTour);
+        
     }
 
-    private boolean jouerUnTour(int numeroTour) throws RemoteException {
+    private void jouerUnTour(int numeroTour) throws RemoteException {
         // Demande à un joueur de jouer
-        Position pos = this.clientsRemote.get(numeroTour % 2).jouer();
-        // Impacter grille
-        Grille grilleImpactee = clients.get((numeroTour + 1) % 2).getGrille();
-        boolean touche = impacterGrille(pos, grilleImpactee);
-        // Notifier joueurs
-        notifierJoueurs(touche, numeroTour);
-        // Test victoire
-        return grilleImpactee.testVictoire();
+        this.clientsRemote.get(numeroTour % 2).jouer();
+        
     }
 
     /**
@@ -137,15 +148,16 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
             String nomJoueur2 = this.clients.get(indiceJoueur2).getName();
             // Affichage grilles
             Grille grille = clients.get(indiceJoueur2).getGrille();
-            String messageJoueur1 = grille.afficherPourAdversaire();
-            String messageJoueur2 = grille.toString();
+            
+            String messageJoueur1 = (this.clientsRemote.get(indiceJoueur1).modeGraphique()) ? "" : grille.afficherPourAdversaire();
+            String messageJoueur2 = (this.clientsRemote.get(indiceJoueur2).modeGraphique()) ? "" : grille.toString();
             // Affichage message personnalisé
             if (touche) {
-                messageJoueur1 += "Bien joué, vous avez touché un bateau de " + nomJoueur2;
-                messageJoueur2 += "PLATCH: " + nomJoueur1 + " a touché un de vos bateaux.";
+                messageJoueur1 += "Bien joué, vous avez touché un bateau de " + nomJoueur2 + "\n";
+                messageJoueur2 += "PLATCH: " + nomJoueur1 + " a touché un de vos bateaux.\n";
             } else {
-                messageJoueur1 += "Raté, tant pis pour la baleine.";
-                messageJoueur2 += "Sauvé, il ne sait pas viser.";
+                messageJoueur1 += "Raté, tant pis pour la baleine.\n";
+                messageJoueur2 += "Sauvé, il ne sait pas viser.\n";
             }
             // Envoie des messages
             this.clientsRemote.get(indiceJoueur1).recevoirMessage(messageJoueur1);

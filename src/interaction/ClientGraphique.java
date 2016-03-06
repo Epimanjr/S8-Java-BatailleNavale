@@ -51,9 +51,9 @@ public class ClientGraphique extends UnicastRemoteObject implements ClientInterf
     }
 
     @Override
-    public Position jouer() throws RemoteException {
-        //TODO
-        return null;
+    public void jouer() throws RemoteException {
+        stagejeu.enAttente = false;
+        this.recevoirMessage("A toi de jouer ! \n");
     }
 
     public String getName() {

@@ -15,7 +15,7 @@ public interface ClientInterface extends Remote {
      */
     public void recevoirMessage(String message) throws RemoteException;
     
-    public Position jouer() throws RemoteException;
+    public void jouer() throws RemoteException;
     
     public boolean modeGraphique() throws RemoteException;
 }
