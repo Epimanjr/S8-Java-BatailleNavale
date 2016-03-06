@@ -5,12 +5,15 @@
  */
 package graphic;
 
+import interaction.Client;
+import interaction.ClientGraphique;
 import interaction.ServeurInterface;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.Animation;
@@ -77,6 +80,8 @@ public class StageJeu extends Stage {
 
     class MainGroup extends Parent {
 
+        ArrayList<Position> listePositions = new ArrayList<>();
+        
         MainGroup() {
             // Tracement du plateau
             tracerPlateau();
@@ -96,8 +101,8 @@ public class StageJeu extends Stage {
         public void tracer(boolean touche, Position position) {
             String text = (touche) ? "X" : "O";
             int sizeFont = ((int) (espacement * 0.8));
-            double posX = margeX + (position.x+1) * espacement + 0.3*espacement;
-            double posY = margeY + (position.y+1) * espacement + 0.8*espacement;
+            double posX = margeX + (position.x + 1) * espacement + 0.3 * espacement;
+            double posY = margeY + (position.y + 1) * espacement + 0.8 * espacement;
             Text chiffre = new Text(posX, posY, text);
             chiffre.setFont(new Font(sizeFont));
             chiffre.setFill(Color.web("#0000ff"));
@@ -171,22 +176,29 @@ public class StageJeu extends Stage {
                     if (event.getX() < margeX + espacement || event.getX() > margeX + 11 * espacement || event.getY() < margeY + espacement || event.getY() > margeY + espacement * 11) {
                         System.err.println("Click en dehors du plateau de jeu");
                     } else {
-                        actionApresClickCorrect(event.getX(), event.getY());
+                        int x = (int) ((event.getX() - margeX) / espacement);
+                        int y = (int) ((event.getY() - margeY) / espacement);
+                        Position pos = new Position(x, y);
+                        if (listePositions.contains(pos)) {
+                            ajouteTextToChat("Attention: tu as déjà cliqué ici.\n");
+                        } else {
+                            listePositions.add(pos);
+                            actionApresClickCorrect(x - 1, y - 1);
+                        }
                     }
                 }
             });
         }
 
-        private void actionApresClickCorrect(double xEvent, double yEvent) {
+        private void actionApresClickCorrect(int x, int y) {
             try {
                 enAttente = true;
-                int x = (int) ((xEvent - margeX) / espacement);
-                int y = (int) ((yEvent - margeY) / espacement);
+
                 //System.out.println(x + ";" + y);
                 // Contact avec le serveur
                 Registry reg = LocateRegistry.getRegistry(3212);
                 ServeurInterface serveur = (ServeurInterface) reg.lookup("Serv");
-                positionCourante = new Position(x - 1, y - 1);
+                positionCourante = new Position(x, y);
                 serveur.sendPosition(positionCourante);
             } catch (RemoteException | NotBoundException ex) {
                 Logger.getLogger(StageJeu.class.getName()).log(Level.SEVERE, null, ex);

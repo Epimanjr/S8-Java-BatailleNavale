@@ -136,4 +136,8 @@ public class Grille implements Serializable {
             return false;
         }
     }
+    
+    public String getValueOfPosition(int x, int y) {
+        return this.grille[x][y];
+    }
 }

@@ -27,7 +27,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
     /**
      * Grille du client.
      */
-    private Grille grille;
+    public static Grille grille;
 
 
     /**
@@ -39,7 +39,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
      */
     public Client(String name, Grille grille) throws RemoteException{
         this.name = name;
-        this.grille = grille;
+        Client.grille = grille;
     }
 
     /**

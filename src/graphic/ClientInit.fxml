@@ -16,12 +16,17 @@
       </Label>
       <Label layoutX="37.0" layoutY="60.0" prefHeight="17.0" prefWidth="100.0" text="Votre nom : " />
       <Separator layoutX="14.0" layoutY="38.0" prefHeight="3.0" prefWidth="360.0" />
-      <TextField layoutX="165.0" layoutY="56.0" fx:id="saisieNom" />
+      <TextField fx:id="saisieNom" layoutX="165.0" layoutY="56.0" />
       <Label layoutX="37.0" layoutY="87.0" prefHeight="17.0" prefWidth="100.0" text="Position bateau" />
-      <RadioButton layoutX="165.0" layoutY="87.0" mnemonicParsing="false" selected="true" text="Vertical" fx:id="posVertical" />
-      <RadioButton layoutX="281.0" layoutY="87.0" mnemonicParsing="false" text="Horizontal" fx:id="posHorizontal" />
+      <RadioButton fx:id="posVertical" layoutX="165.0" layoutY="87.0" mnemonicParsing="false" selected="true" text="Vertical" />
+      <RadioButton fx:id="posHorizontal" layoutX="281.0" layoutY="87.0" mnemonicParsing="false" text="Horizontal" />
       <Slider fx:id="sliderX" blockIncrement="1.0" layoutX="170.0" layoutY="114.0" max="10.0" min="1.0" showTickLabels="true" showTickMarks="true" value="5.0" />
       <Slider fx:id="sliderY" blockIncrement="1.0" layoutX="151.0" layoutY="150.0" max="10.0" min="1.0" orientation="VERTICAL" value="5.0" />
-      <Button onAction="#validerInscription" layoutX="228.0" layoutY="290.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="181.0" text="Valider votre inscription" />
+      <Button layoutX="228.0" layoutY="290.0" mnemonicParsing="false" onAction="#validerInscription" prefHeight="25.0" prefWidth="181.0" text="Valider votre inscription" />
+      <Label fx:id="label" layoutX="203.0" layoutY="173.0" prefHeight="38.0" prefWidth="83.0" text="(5;5)">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

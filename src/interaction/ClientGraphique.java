@@ -28,7 +28,7 @@ public class ClientGraphique extends UnicastRemoteObject implements ClientInterf
     /**
      * Grille du client.
      */
-    private Grille grille;
+    public static Grille grille;
 
 
     /**
@@ -40,7 +40,7 @@ public class ClientGraphique extends UnicastRemoteObject implements ClientInterf
      */
     public ClientGraphique(String name, Grille grille) throws RemoteException{
         this.name = name;
-        this.grille = grille;
+        ClientGraphique.grille = grille;
     }
     
     @Override

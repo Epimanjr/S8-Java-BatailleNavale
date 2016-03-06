@@ -20,9 +20,12 @@ import java.rmi.registry.Registry;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -46,7 +49,11 @@ public class ClientInitController implements Initializable {
     
     @FXML
     Slider sliderX;
+    @FXML
     Slider sliderY;
+    
+    @FXML
+    Label label;
 
     private final ToggleGroup tg = new ToggleGroup();
 
@@ -59,6 +66,25 @@ public class ClientInitController implements Initializable {
         // Groupe de RadioButton
         posVertical.setToggleGroup(tg);
         posHorizontal.setToggleGroup(tg);
+        // Action slider
+        sliderX.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                mettreAJourLabel();
+            }
+        });
+        sliderY.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                mettreAJourLabel();
+            }
+        });
+    }
+    
+    private void mettreAJourLabel() {
+        int x = (int)sliderX.getValue();
+        int y = (int)sliderY.getValue();
+        label.setText("("+x+";"+y+")");
     }
 
     @FXML
@@ -72,8 +98,8 @@ public class ClientInitController implements Initializable {
             try {
                 // Récupération variables
                 String name = saisieNom.getText();
-                String orientation = (tg.getSelectedToggle().toString().endsWith("Horizontal")) ? "H" : "V";
-                BoatPosition position = new BoatPosition(orientation, 2,2);
+                String orientation = (tg.getSelectedToggle().toString().endsWith("'Horizontal'")) ? "H" : "V";
+                BoatPosition position = new BoatPosition(orientation, (int)sliderX.getValue(),(int)sliderY.getValue());
                 // Vérifier l'inscription
                 Grille grille = serveur.verifierInscription(name, position);
                 ClientGraphique client = new ClientGraphique(name, grille);
