@@ -137,6 +137,11 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
         return new Position(x-1, y-1);
     }
 
+    @Override
+    public boolean modeGraphique() throws RemoteException {
+        return false;
+    }
+
     
     
     

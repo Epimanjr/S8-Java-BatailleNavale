@@ -63,7 +63,7 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
         notifierClients();
         // Lancement du jeu si 2 joueurs
         if (clients.size() == 2) {
-            lancerPartie();
+            //lancerPartie();
         }
     }
 
@@ -80,8 +80,8 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
             victoire = jouerUnTour(numeroTour);
             numeroTour++;
         }
-        ClientInterface vainqueur = this.clientsRemote.get((numeroTour-1)%2);
-        ClientInterface perdant = this.clientsRemote.get((numeroTour)%2);
+        ClientInterface vainqueur = this.clientsRemote.get((numeroTour - 1) % 2);
+        ClientInterface perdant = this.clientsRemote.get((numeroTour) % 2);
         vainqueur.recevoirMessage("Bravo, tu as gagné la partie.");
         vainqueur.recevoirMessage("Tu as perdu la partie.");
         // Fin de la partie
@@ -168,14 +168,22 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
                 // Cas où pas de joueur avant
                 case 1:
                     // Message pour le joueur 1
-                    message += "Votre grille : \n" + clients.get(0).getGrille() + "En attente d'un adversaire ...";
+
+                    if (!joueur1.modeGraphique()) {
+                        message += "Votre grille : \n" + clients.get(0).getGrille();
+                    }
+                    message += "En attente d'un adversaire ...";
                     joueur1.recevoirMessage(message);
                     break;
                 // Cas où il rejoint un joueur
                 case 2:
                     // Message pour le joueur 2
-                    message += "Votre grille : \n" + clients.get(1).getGrille() + "Vous avez rejoint la partie de " + clients.get(0).getName() + "\n";
                     ClientInterface joueur2 = (ClientInterface) reg.lookup("Client_" + clients.get(1).getName());
+                    if (!joueur2.modeGraphique()) {
+                        message += "Votre grille : \n" + clients.get(1).getGrille();
+                    }
+                    message += "Vous avez rejoint la partie de " + clients.get(0).getName() + "\n";
+
                     joueur2.recevoirMessage(message);
                     // Message pour le joueur 1
                     String message1 = "trouvé !\nVous allez affronter " + clients.get(1).getName();
