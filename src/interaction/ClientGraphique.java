@@ -42,6 +42,11 @@ public class ClientGraphique extends UnicastRemoteObject implements ClientInterf
         this.name = name;
         this.grille = grille;
     }
+    
+    @Override
+    public void afficherResultat(boolean touche) throws RemoteException {
+        stagejeu.tracer(touche);
+    }
 
     @Override
     public void recevoirMessage(String message) throws RemoteException {

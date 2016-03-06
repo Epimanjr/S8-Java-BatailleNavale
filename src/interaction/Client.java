@@ -143,7 +143,10 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
         return false;
     }
 
-    
-    
-    
+    @Override
+    public void afficherResultat(boolean touche) throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+
 }

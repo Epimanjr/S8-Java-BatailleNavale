@@ -18,4 +18,7 @@ public interface ClientInterface extends Remote {
     public void jouer() throws RemoteException;
     
     public boolean modeGraphique() throws RemoteException;
+    
+    public abstract void afficherResultat(boolean touche) throws RemoteException;
+    
 }

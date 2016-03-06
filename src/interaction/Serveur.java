@@ -34,6 +34,7 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
     private int numeroTour;
 
     private final Registry reg;
+    
 
     public Serveur() throws RemoteException {
         reg = LocateRegistry.getRegistry(3212);
@@ -160,6 +161,7 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
                 messageJoueur2 += "Sauvé, il ne sait pas viser.\n";
             }
             // Envoie des messages
+            this.clientsRemote.get(indiceJoueur1).afficherResultat(touche);
             this.clientsRemote.get(indiceJoueur1).recevoirMessage(messageJoueur1);
             this.clientsRemote.get(indiceJoueur2).recevoirMessage(messageJoueur2);
         } catch (AccessException ex) {
@@ -172,8 +174,6 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
      */
     private void notifierClients() throws RemoteException {
         try {
-            Registry reg = LocateRegistry.getRegistry(3212);
-
             String message = "Votre inscription a été acceptée par le serveur.\n";
             ClientInterface joueur1 = (ClientInterface) reg.lookup("Client_" + clients.get(0).getName());
             switch (clients.size()) {
@@ -184,7 +184,7 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
                     if (!joueur1.modeGraphique()) {
                         message += "Votre grille : \n" + clients.get(0).getGrille();
                     }
-                    message += "En attente d'un adversaire ...";
+                    message += "En attente d'un adversaire ...\n";
                     joueur1.recevoirMessage(message);
                     break;
                 // Cas où il rejoint un joueur
@@ -198,7 +198,7 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
 
                     joueur2.recevoirMessage(message);
                     // Message pour le joueur 1
-                    String message1 = "trouvé !\nVous allez affronter " + clients.get(1).getName();
+                    String message1 = "trouvé !\nVous allez affronter " + clients.get(1).getName() + "\n";
                     joueur1.recevoirMessage(message1);
                     break;
                 default:
