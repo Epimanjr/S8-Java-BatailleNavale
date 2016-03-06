@@ -26,9 +26,17 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
      */
     private final ArrayList<Client> clients = new ArrayList<>();
 
+    /**
+     * Contient les objets clients distants.
+     */
+    private ArrayList<ClientInterface> clientsRemote = new ArrayList<>();
+
     private int numeroTour;
 
+    private final Registry reg;
+
     public Serveur() throws RemoteException {
+        reg = LocateRegistry.getRegistry(3212);
     }
 
     @Override
@@ -67,28 +75,43 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
     private void lancerPartie() throws RemoteException {
         boolean victoire = false;
         numeroTour = 0;
-        String nameJoueurQuiDoitJouer="";
+        initRemote();
+        while (!victoire) {
+            victoire = jouerUnTour(numeroTour);
+            numeroTour++;
+        }
+        ClientInterface vainqueur = this.clientsRemote.get((numeroTour-1)%2);
+        ClientInterface perdant = this.clientsRemote.get((numeroTour)%2);
+        vainqueur.recevoirMessage("Bravo, tu as gagné la partie.");
+        vainqueur.recevoirMessage("Tu as perdu la partie.");
+        // Fin de la partie
+        System.out.println("Fin de la partie");
+    }
+
+    private boolean jouerUnTour(int numeroTour) throws RemoteException {
+        // Demande à un joueur de jouer
+        Position pos = this.clientsRemote.get(numeroTour % 2).jouer();
+        // Impacter grille
+        Grille grilleImpactee = clients.get((numeroTour + 1) % 2).getGrille();
+        boolean touche = impacterGrille(pos, grilleImpactee);
+        // Notifier joueurs
+        notifierJoueurs(touche, numeroTour);
+        // Test victoire
+        return grilleImpactee.testVictoire();
+    }
+
+    /**
+     * Méthode qui va récupérer les interfaces clients nécessaires.
+     *
+     * @throws RemoteException
+     */
+    private void initRemote() throws RemoteException {
         try {
-            Registry reg = LocateRegistry.getRegistry(3212);
-            while (!victoire) {
-                // Demande à un joueur de jouer
-                nameJoueurQuiDoitJouer = clients.get(numeroTour % 2).getName();
-                ClientInterface joueur = (ClientInterface) reg.lookup("Client_" + nameJoueurQuiDoitJouer);
-                Position pos = joueur.jouer();
-                // Impacter grille
-                Grille grilleImpactee = clients.get((numeroTour+1)%2).getGrille();
-                boolean touche = impacterGrille(pos, grilleImpactee);
-                // Notifier joueurs
-                notifierJoueurs(touche, numeroTour % 2, reg, joueur);
-                // Test victoire
-                victoire = grilleImpactee.testVictoire();
-                numeroTour++;
+            for (Client client : this.clients) {
+                this.clientsRemote.add((ClientInterface) reg.lookup("Client_" + client.getName()));
             }
-            // Fin de la partie
-            System.out.println("Fin de la partie");
-            System.out.println("Vainqueur : " +nameJoueurQuiDoitJouer);
-        } catch (NotBoundException | AccessException ex) {
-            Logger.getLogger(Serveur.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (RemoteException | NotBoundException e) {
+            System.err.println("Erreur: echec de la récupération des clients distants.");
         }
     }
 
@@ -103,28 +126,31 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
         // Impact sur la grille
         return grille.impact(pos);
     }
-    
-    
-    private void notifierJoueurs(boolean touche, int indiceJoueur1, Registry reg, ClientInterface joueur) throws RemoteException {
+
+    private void notifierJoueurs(boolean touche, int numeroTour) throws RemoteException {
         try {
-            int indiceJoueur2 = (indiceJoueur1+1)%2;
-            ClientInterface joueur2 = (ClientInterface) reg.lookup("Client_" + clients.get(indiceJoueur2).getName());
+            // Indices
+            int indiceJoueur1 = numeroTour % 2;
+            int indiceJoueur2 = (numeroTour + 1) % 2;
+            // Noms
+            String nomJoueur1 = this.clients.get(indiceJoueur1).getName();
+            String nomJoueur2 = this.clients.get(indiceJoueur2).getName();
             // Affichage grilles
             Grille grille = clients.get(indiceJoueur2).getGrille();
             String messageJoueur1 = grille.afficherPourAdversaire();
             String messageJoueur2 = grille.toString();
             // Affichage message personnalisé
-            if(touche) {
-                messageJoueur1 += "Bien joué, vous avez touché un bateau de " + clients.get(indiceJoueur2).getName();
-                messageJoueur2 += "PLATCH: " + clients.get(indiceJoueur1).getName() + " a touché un de vos bateaux.";
+            if (touche) {
+                messageJoueur1 += "Bien joué, vous avez touché un bateau de " + nomJoueur2;
+                messageJoueur2 += "PLATCH: " + nomJoueur1 + " a touché un de vos bateaux.";
             } else {
                 messageJoueur1 += "Raté, tant pis pour la baleine.";
                 messageJoueur2 += "Sauvé, il ne sait pas viser.";
             }
             // Envoie des messages
-            joueur.recevoirMessage(messageJoueur1);
-            joueur2.recevoirMessage(messageJoueur2);
-        } catch (NotBoundException | AccessException ex) {
+            this.clientsRemote.get(indiceJoueur1).recevoirMessage(messageJoueur1);
+            this.clientsRemote.get(indiceJoueur2).recevoirMessage(messageJoueur2);
+        } catch (AccessException ex) {
             Logger.getLogger(Serveur.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
