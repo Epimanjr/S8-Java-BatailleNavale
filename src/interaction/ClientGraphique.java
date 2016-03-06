@@ -5,7 +5,6 @@
  */
 package interaction;
 
-import graphic.ClientInitStage;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -17,6 +16,7 @@ import model.Position;
  */
 public class ClientGraphique extends UnicastRemoteObject implements ClientInterface, Serializable {
 
+    
     public ClientGraphique() throws RemoteException {
     }
 
@@ -29,6 +29,10 @@ public class ClientGraphique extends UnicastRemoteObject implements ClientInterf
     @Override
     public Position jouer() throws RemoteException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public static void main(String[] args) {
+        
     }
     
 
