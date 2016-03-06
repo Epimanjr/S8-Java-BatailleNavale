@@ -85,8 +85,8 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
     }
     
     private void finPartie() throws RemoteException {
-        ClientInterface vainqueur = this.clientsRemote.get((numeroTour - 1) % 2);
-        ClientInterface perdant = this.clientsRemote.get((numeroTour) % 2);
+        ClientInterface vainqueur = this.clientsRemote.get((numeroTour) % 2);
+        ClientInterface perdant = this.clientsRemote.get((numeroTour+1) % 2);
         vainqueur.recevoirMessage("Bravo, tu as gagné la partie.\n");
         perdant.recevoirMessage("Tu as perdu la partie.\n");
         // Fin de la partie
