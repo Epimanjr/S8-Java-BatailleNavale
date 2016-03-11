@@ -99,7 +99,7 @@ public class ClientInitController implements Initializable {
                 // Récupération variables
                 String name = saisieNom.getText();
                 String orientation = (tg.getSelectedToggle().toString().endsWith("'Horizontal'")) ? "H" : "V";
-                BoatPosition position = new BoatPosition(orientation, (int)sliderX.getValue(),(int)sliderY.getValue());
+                BoatPosition position = new BoatPosition(orientation, (int)sliderX.getValue()-1,(int)sliderY.getValue()-1);
                 // Vérifier l'inscription
                 Grille grille = serveur.verifierInscription(name, position);
                 ClientGraphique client = new ClientGraphique(name, grille);
