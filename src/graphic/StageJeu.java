@@ -101,8 +101,8 @@ public class StageJeu extends Stage {
         public void tracer(boolean touche, Position position) {
             String text = (touche) ? "X" : "O";
             int sizeFont = ((int) (espacement * 0.8));
-            double posX = margeX + (position.x + 1) * espacement + 0.3 * espacement;
-            double posY = margeY + (position.y + 1) * espacement + 0.8 * espacement;
+            double posX = margeX + (position.y + 1) * espacement + 0.3 * espacement;
+            double posY = margeY + (position.x + 1) * espacement + 0.8 * espacement;
             Text chiffre = new Text(posX, posY, text);
             chiffre.setFont(new Font(sizeFont));
             chiffre.setFill(Color.web("#0000ff"));
@@ -198,7 +198,7 @@ public class StageJeu extends Stage {
                 // Contact avec le serveur
                 Registry reg = LocateRegistry.getRegistry(3212);
                 ServeurInterface serveur = (ServeurInterface) reg.lookup("Serv");
-                positionCourante = new Position(x, y);
+                positionCourante = new Position(y, x);
                 serveur.sendPosition(positionCourante);
             } catch (RemoteException | NotBoundException ex) {
                 Logger.getLogger(StageJeu.class.getName()).log(Level.SEVERE, null, ex);

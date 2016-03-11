@@ -34,14 +34,13 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
     private int numeroTour;
 
     private final Registry reg;
-    
 
     public Serveur() throws RemoteException {
         reg = LocateRegistry.getRegistry(3212);
     }
 
     @Override
-    public Grille verifierInscription(String name, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException {
+    public void verifierInscription(String name, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException {
         // Déjà deux joueurs
         if (clients.size() >= 2) {
             throw new PartiePleineException();
@@ -50,9 +49,7 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
         if (clients.contains(new Client(name, null))) {
             throw new NomExistantException();
         }
-        // Création de la grille
-        Grille grille = new Grille(position);
-        return grille;
+        
     }
 
     @Override
@@ -64,29 +61,42 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
         notifierClients();
         // Lancement du jeu si 2 joueurs
         if (clients.size() == 2) {
+            System.err.println(clients.get(0).getGrille() + "" + clients.get(1).getGrille());
             lancerPartie();
         }
     }
-    
+
     @Override
     public void sendPosition(Position position) throws RemoteException {
         // Impacter grille
         Grille grilleImpactee = clients.get((numeroTour + 1) % 2).getGrille();
+
+        afficherEtatPartie("Avant impact");
         boolean touche = impacterGrille(position, grilleImpactee);
+        afficherEtatPartie("Après impact");
         // Notifier joueurs
         notifierJoueurs(touche, numeroTour);
         // Test victoire
-        if(grilleImpactee.testVictoire()) {
+        if (grilleImpactee.testVictoire()) {
             finPartie();
         } else {
             numeroTour++;
             jouerUnTour(numeroTour);
         }
     }
-    
+
+    private void afficherEtatPartie(String message) throws RemoteException {
+        for (int i = 0; i <= 1; i++) {
+            Client client = clients.get(i);
+            System.out.println("Grille de " + client.getName() + " " + message);
+            System.out.println(client.getGrille());
+        }
+
+    }
+
     private void finPartie() throws RemoteException {
         ClientInterface vainqueur = this.clientsRemote.get((numeroTour) % 2);
-        ClientInterface perdant = this.clientsRemote.get((numeroTour+1) % 2);
+        ClientInterface perdant = this.clientsRemote.get((numeroTour + 1) % 2);
         vainqueur.recevoirMessage("Bravo, tu as gagné la partie.\n");
         perdant.recevoirMessage("Tu as perdu la partie.\n");
         // Fin de la partie
@@ -103,13 +113,13 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
         numeroTour = 0;
         initRemote();
         jouerUnTour(numeroTour);
-        
+
     }
 
     private void jouerUnTour(int numeroTour) throws RemoteException {
         // Demande à un joueur de jouer
         this.clientsRemote.get(numeroTour % 2).jouer();
-        
+
     }
 
     /**
@@ -149,7 +159,7 @@ public class Serveur extends UnicastRemoteObject implements ServeurInterface {
             String nomJoueur2 = this.clients.get(indiceJoueur2).getName();
             // Affichage grilles
             Grille grille = clients.get(indiceJoueur2).getGrille();
-            
+
             String messageJoueur1 = (this.clientsRemote.get(indiceJoueur1).modeGraphique()) ? "" : grille.afficherPourAdversaire();
             String messageJoueur2 = (this.clientsRemote.get(indiceJoueur2).modeGraphique()) ? "" : grille.toString();
             // Affichage message personnalisé

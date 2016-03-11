@@ -101,7 +101,8 @@ public class ClientInitController implements Initializable {
                 String orientation = (tg.getSelectedToggle().toString().endsWith("'Horizontal'")) ? "H" : "V";
                 BoatPosition position = new BoatPosition(orientation, (int)sliderX.getValue()-1,(int)sliderY.getValue()-1);
                 // Vérifier l'inscription
-                Grille grille = serveur.verifierInscription(name, position);
+                serveur.verifierInscription(name, position);
+                Grille grille = new Grille(position);
                 ClientGraphique client = new ClientGraphique(name, grille);
                 // OK
                 reg.rebind("Client_" + name, (ClientInterface) client);

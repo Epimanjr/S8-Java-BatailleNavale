@@ -12,7 +12,7 @@ import model.Position;
 
 public interface ServeurInterface extends Remote {
     
-    public abstract Grille verifierInscription(String name, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException;
+    public abstract void verifierInscription(String name, BoatPosition position) throws RemoteException, PartiePleineException, NomExistantException;
     public abstract void setClient(String name, Grille grille) throws RemoteException;
     public abstract void sendPosition(Position position) throws RemoteException;
     

@@ -27,7 +27,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
     /**
      * Grille du client.
      */
-    public static Grille grille;
+    public Grille grille;
 
 
     /**
@@ -39,7 +39,7 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
      */
     public Client(String name, Grille grille) throws RemoteException{
         this.name = name;
-        Client.grille = grille;
+        this.grille = grille;
     }
 
     /**
@@ -63,12 +63,13 @@ public class Client extends UnicastRemoteObject implements ClientInterface, Seri
 
             try {
                 // Vérifier l'inscription
-                Grille grille = serveur.verifierInscription(name, position);
-                Client client = new Client(name, grille);
+                serveur.verifierInscription(name, position);
+                Grille g = new Grille(position);
+                Client client = new Client(name, g);
                 // OK
                 reg.rebind("Client_"+name, (ClientInterface)client);
                 // Demande d'ajout auprès du serveur
-                serveur.setClient(name, grille);
+                serveur.setClient(name, g);
             } catch (PartiePleineException ex) {
                 System.err.println("Erreur: partie déjà pleine.");
             } catch (NomExistantException ex) {
